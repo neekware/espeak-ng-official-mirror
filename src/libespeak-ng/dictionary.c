@@ -211,8 +211,16 @@ int LoadDictionary(Translator *tr, const char *name, int no_error)
 	// Load a pronunciation data file into memory
 	// bytes 0-3:  offset to rules data
 	// bytes 4-7:  number of hash table entries
-	sprintf(fname, "%s%c%s_dict", path_home, PATHSEP, name);
+	
+	// First try the new structure with dicts subdirectory
+	sprintf(fname, "%s%cdicts%c%s_dict", path_home, PATHSEP, PATHSEP, name);
 	size = GetFileLength(fname);
+	
+	// Fallback to old flat structure for backward compatibility
+	if (size <= 0) {
+		sprintf(fname, "%s%c%s_dict", path_home, PATHSEP, name);
+		size = GetFileLength(fname);
+	}
 
 	if (tr->data_dictlist != NULL) {
 		free(tr->data_dictlist);
